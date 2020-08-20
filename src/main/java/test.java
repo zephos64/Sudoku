@@ -14,8 +14,13 @@ public class test {
 
         System.out.println("======================================");
 
+        long startTime = System.currentTimeMillis();
         Solver test = new Solver();
         test.attemptGrid(sudoku);
+        long endTime = System.currentTimeMillis();
         sudoku.printGrid();
+
+        System.out.println("======================================");
+        System.out.println("Elapsed time: " + String.valueOf(endTime-startTime));
     }
 }

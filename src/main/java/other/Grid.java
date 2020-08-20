@@ -1,14 +1,17 @@
 package main.java.other;
 
 public class Grid {
+    int size = 9;
+
     private int[][] subGrid;
-    private int[][] originalGrid;
 
     public Grid() {
-        subGrid = new int[9][9];
-        originalGrid = new int[9][9];
+        subGrid = new int[size][size];
     }
-    
+
+    public int getSize() {
+        return size;
+    }
 
     public boolean isSpotValidForValue(int x, int y, int value) {
         boolean row = doesRowHaveValue(y, value);
@@ -59,22 +62,21 @@ public class Grid {
 
     private int numToSubGrid(int num) {
         if(num < 3) return 0;
-        if(num < 6) return 1;
-        return 2;
+        if(num < 6) return 3;
+        return 6;
     }
 
     public boolean createGrid(String grid, String delimiter) {
         String[] splitGrid = grid.split(delimiter);
-        if(splitGrid.length != 81) {
+        if(splitGrid.length != size * size) {
             System.out.println("Grid of bad size, size is " + splitGrid.length);
             return false;
         }
         int x = 0, y = 0;
         for(String s : splitGrid) {
             subGrid[y][x] = Integer.valueOf(s);
-            originalGrid[y][x] = Integer.valueOf(s);
             x++;
-            if(x >= 9) {
+            if(x >= size) {
                 x = 0;
                 y++;
             }
@@ -83,17 +85,9 @@ public class Grid {
         return true;
     }
 
-    public void resetGrid() {
-        for(int y = 0; y < 9; y++) {
-            for(int x = 0; x < 9; x++) {
-                subGrid[y][x] = originalGrid[y][x];
-            }
-        }
-    }
-
     public void printGrid() {
-        for(int y = 0; y < 9; y++) {
-            for(int x = 0; x < 9; x++) {
+        for(int y = 0; y < size; y++) {
+            for(int x = 0; x < size; x++) {
                 System.out.print(subGrid[y][x] + " ");
             }
             System.out.println();
