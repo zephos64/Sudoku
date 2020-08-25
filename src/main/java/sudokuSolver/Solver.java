@@ -7,16 +7,46 @@ import java.util.Stack;
 
 public class Solver {
 
-    public void attemptGrid(Grid grid) {
-        attempGrid_helper_stack(grid);
+    Grid grid;
+
+    public Solver(Grid grid) {
+        this.grid = grid;
     }
 
-    private void attempGrid_helper_stack(Grid grid) {
-        // Milliseconds taken for this: 11-13
-        // Milliseconds taken for this: 9-12 with loc hint
+    public void attemptGrid() {
+
+        //attemptGrid_singleCandidates();
+        //attemptGrid_hiddenSingles();
+
+        // TODO: only do brute force if SC and HS cant find any more solutions
+        //attempGrid_bruteForce_stack();
+        attemptGrid_bruteForce_recursive();
+    }
+
+    public void printGrid() {grid.printGrid();}
+
+    private void attemptGrid_singleCandidates() {
+        boolean hasGuess = false;
+        for(int i = 0; i < grid.getSize(); i++) {
+            for(int j = 0; j < grid.getSize(); j++) {
+                if(grid.isSpotEmpty(i, j) && grid.doesSpotHaveOneGuess(i, j)) {
+                    grid.setSpotValueAndRemoveGuesses(i, j, grid.getNextSpotGuess(i, j, 0));
+                    hasGuess = true;
+                }
+            }
+        }
+
+        if(hasGuess) attemptGrid_singleCandidates();
+    }
+
+    private void attemptGrid_hiddenSingles() {
+
+    }
+
+    private void attempGrid_bruteForce_stack() {
         Stack<GridGuess> guessStack = new Stack<>();
 
-        GridGuess guess = getNextGuessLoc(grid, 0, 0);
+        GridGuess guess = getNextGuessLoc(0, 0);
         while(guess != null) {
             boolean foundGuess = false;
             for (int numGuess = guess.getGuess()+1; !foundGuess && numGuess <= grid.getSize(); numGuess++) {
@@ -29,7 +59,7 @@ public class Solver {
 
             if(foundGuess) {
                 guessStack.push(guess);
-                guess = getNextGuessLoc(grid, guess.getX(), guess.getY());
+                guess = getNextGuessLoc(guess.getX(), guess.getY());
             } else {
                 // Reset spots, to ensure we dont get some odd collisions
                 guess = guessStack.pop();
@@ -38,7 +68,7 @@ public class Solver {
         }
     }
 
-    private GridGuess getNextGuessLoc(Grid grid, int x, int y) {
+    private GridGuess getNextGuessLoc(int x, int y) {
         GridGuess guessCoord = new GridGuess();
         for(int i = y; i < grid.getSize(); i++) {
             for(int j = 0; j < grid.getSize(); j++) {
@@ -55,40 +85,28 @@ public class Solver {
 
     /**
      * Return true if finished successfully, false if could not guess next element
-     * @param grid
      * @return
      */
-    private boolean attemptGrid_helper_recursive(Grid grid) {
-        // Milliseconds taken for this: 6-9
-        // Find first allowed area
-        int x = -1, y = -1;
-        for(int i = 0; i < grid.getSize(); i++) {
-            for(int j = 0; j < grid.getSize(); j++) {
-                if(grid.isSpotEmpty(j, i)) {
-                    x = j;
-                    y = i;
-                    break;
-                }
-            }
-            if(x != -1) break;
-        }
+    private boolean attemptGrid_bruteForce_recursive() {
+        if(grid.isSolved()) return true;
 
-        // No more valid solutions
-        if(x == -1) return true;
+        GridGuess guessLoc = getNextGuessLoc(0, 0);
 
+        // TODO refactor guessing, use Cell guess
         for(int guess = 1; guess <= grid.getSize(); guess++) {
-            if(grid.isSpotValidForValue(x, y, guess)) {
-                grid.setSpotValue(x, y, guess);
-                boolean childGuess = attemptGrid_helper_recursive(grid);
+            if(grid.isSpotValidForValue(guessLoc.getX(), guessLoc.getY(), guess)) {
+                grid.setSpotValue(guessLoc.getX(), guessLoc.getY(), guess);
+                boolean childGuess = attemptGrid_bruteForce_recursive();
 
                 if(!childGuess) {
-                    grid.setSpotValue(x, y, 0);
+                    grid.setSpotValue(guessLoc.getX(), guessLoc.getY(), 0);
                 }
             }
         }
 
+
         // Could not find a valid solution, fail out
-        if(grid.isSpotEmpty(x, y)) return false;
+        if(grid.isSpotEmpty(guessLoc.getX(), guessLoc.getY())) return false;
 
         return true;
     }
