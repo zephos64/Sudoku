@@ -1,5 +1,6 @@
 package main.java.sudokuSolver;
 
+import main.java.other.Cell;
 import main.java.other.Grid;
 import main.java.other.GridGuess;
 
@@ -15,32 +16,44 @@ public class Solver {
 
     public void attemptGrid() {
 
-        //attemptGrid_singleCandidates();
-        //attemptGrid_hiddenSingles();
+        //while(attemptGrid_singleCandidates()){};
+        attemptGrid_hiddenSingles();
 
         // TODO: only do brute force if SC and HS cant find any more solutions
         //attempGrid_bruteForce_stack();
-        attemptGrid_bruteForce_recursive();
+        //attemptGrid_bruteForce_recursive();
     }
 
     public void printGrid() {grid.printGrid();}
 
-    private void attemptGrid_singleCandidates() {
+    private boolean attemptGrid_singleCandidates() {
         boolean hasGuess = false;
         for(int i = 0; i < grid.getSize(); i++) {
             for(int j = 0; j < grid.getSize(); j++) {
-                if(grid.isSpotEmpty(i, j) && grid.doesSpotHaveOneGuess(i, j)) {
-                    grid.setSpotValueAndRemoveGuesses(i, j, grid.getNextSpotGuess(i, j, 0));
+                if(grid.isSpotEmpty(i, j) && grid.getSpot(i, j).getGuessAmnt()==1) {
+                    grid.setSpotValueAndRemoveGuesses(i, j, grid.getSpot(i, j).getGuess(0));
                     hasGuess = true;
                 }
             }
         }
 
-        if(hasGuess) attemptGrid_singleCandidates();
+        return hasGuess;
     }
 
-    private void attemptGrid_hiddenSingles() {
-
+    private boolean attemptGrid_hiddenSingles() {
+        boolean hasGuess = false;
+        for(int i = 0; i < grid.getSize(); i++) {
+            for (int j = 0; j < grid.getSize(); j++) {
+                Cell spot = grid.getSpot(i, j);
+                for(int guessInd = 0; guessInd < spot.getGuessAmnt(); guessInd++) {
+                    if(grid.isSpotEmpty(i, j) &&
+                            grid.isSpotValidForGuess(i, j, spot.getGuess(guessInd))) {
+                        grid.setSpotValueAndRemoveGuesses(i, j, spot.getGuess(guessInd));
+                    }
+                }
+            }
+        }
+        return hasGuess;
     }
 
     private void attempGrid_bruteForce_stack() {
@@ -93,7 +106,20 @@ public class Solver {
         GridGuess guessLoc = getNextGuessLoc(0, 0);
 
         // TODO refactor guessing, use Cell guess
-        for(int guess = 1; guess <= grid.getSize(); guess++) {
+        /*for(int guess = 1; guess <= grid.getSize(); guess++) {
+            if(grid.isSpotValidForValue(guessLoc.getX(), guessLoc.getY(), guess)) {
+                grid.setSpotValue(guessLoc.getX(), guessLoc.getY(), guess);
+                boolean childGuess = attemptGrid_bruteForce_recursive();
+
+                if(!childGuess) {
+                    grid.setSpotValue(guessLoc.getX(), guessLoc.getY(), 0);
+                }
+            }
+        }*/
+        for(int guessIndx = 0;
+            guessIndx < grid.getSpot(guessLoc.getX(), guessLoc.getY()).getGuessAmnt();
+            guessIndx++) {
+            int guess = grid.getSpot(guessLoc.getX(), guessLoc.getY()).getGuess(guessIndx);
             if(grid.isSpotValidForValue(guessLoc.getX(), guessLoc.getY(), guess)) {
                 grid.setSpotValue(guessLoc.getX(), guessLoc.getY(), guess);
                 boolean childGuess = attemptGrid_bruteForce_recursive();

@@ -35,6 +35,13 @@ public class Grid {
         return !(row || col || grid);
     }
 
+    public boolean isSpotValidForGuess(int x, int y, int guess) {
+        boolean row = doesRowHaveGuess(x, y, guess);
+        boolean col = doesColHaveGuess(x, y, guess);
+        boolean grid = doesSubGridHaveGuess(x, y, guess);
+        return !(row || col || grid);
+    }
+
     public void setSpotValue(int x, int y, int value) {
         grid[y][x].setValue(value);
     }
@@ -48,12 +55,8 @@ public class Grid {
         return grid[y][x].getValue() == 0;
     }
 
-    public boolean doesSpotHaveOneGuess(int x, int y) {
-        return grid[y][x].getGuessAmnt() == 1;
-    }
-
-    public int getNextSpotGuess(int x, int y, int index) {
-        return grid[y][x].getGuess(index);
+    public Cell getSpot(int x, int y) {
+        return grid[y][x];
     }
 
     private boolean doesRowHaveValue(int y, int value) {
@@ -63,9 +66,30 @@ public class Grid {
         return false;
     }
 
+    private boolean doesRowHaveGuess(int x, int y, int guess) {
+        for(int i = 0; i < grid.length; i++) {
+            if(x == i) continue;
+            for(int j = 0; j < grid[y][i].getGuessAmnt(); j++) {
+                if(grid[y][i].getGuess(j) == guess) return true;
+            }
+
+        }
+        return false;
+    }
+
     private boolean doesColHaveValue(int x, int value) {
         for(int i = 0; i < grid.length; i++) {
             if(grid[i][x].getValue() == value) return true;
+        }
+        return false;
+    }
+
+    private boolean doesColHaveGuess(int x, int y, int guess) {
+        for(int i = 0; i < grid.length; i++) {
+            if(y == i) continue;
+            for(int j = 0; j < grid[i][x].getGuessAmnt(); j++) {
+                if(grid[i][x].getGuess(j) == guess) return true;
+            }
         }
         return false;
     }
@@ -80,7 +104,25 @@ public class Grid {
 
         for(int xMin = xMinOrig; xMin < xMax; xMin++) {
             for(int yMin = yMinOrig; yMin < yMax; yMin++) {
-                if(grid[yMin][xMin].getValue() == value) return true;
+                if(yMin != y && xMin != x && grid[yMin][xMin].getValue() == value) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean doesSubGridHaveGuess(int x, int y, int guess) {
+        int xMinOrig = 0, yMinOrig = 0, xMax = 0, yMax = 0;
+
+        xMinOrig = numToSubGrid(x);
+        yMinOrig = numToSubGrid(y);
+        xMax = xMinOrig+3;
+        yMax = yMinOrig+3;
+
+        for(int xMin = xMinOrig; xMin < xMax; xMin++) {
+            for(int yMin = yMinOrig; yMin < yMax; yMin++) {
+                for(int j = 0; j < grid[yMin][xMin].getGuessAmnt(); j++) {
+                    if(grid[yMin][xMin].getValue() == guess) return true;
+                }
             }
         }
         return false;
