@@ -11,14 +11,14 @@ public class test {
         //sudoku.createGrid("530070000600195000098000060800060003400803001700020006060000280000419005000080079");
 
         // This can be solved with just single-candidcies method
-        sudoku.createGrid("026500090500079004300010000600000807075020010010000400000308902700060040030200100");
+        //sudoku.createGrid("026500090500079004300010000600000807075020010010000400000308902700060040030200100");
 
-        //sudoku.createGrid("000002904087009003409000050028090000000007000000080006000400078010060000034900001");
-        // Just BT, around 32
-        // SC and BT: 6 to 16
+        sudoku.createGrid("000002904087009003409000050028090000000007000000080006000400078010060000034900001");
+        // Just BF, around 32
+        // SC and BF: 20
+        // SC, HS, and BF: 10
 
         sudoku.printGrid();
-        //https://en.wikipedia.org/wiki/Sudoku
 
         System.out.println("======================================");
 

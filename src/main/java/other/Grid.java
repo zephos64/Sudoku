@@ -36,10 +36,11 @@ public class Grid {
     }
 
     public boolean isSpotValidForGuess(int x, int y, int guess) {
-        boolean row = doesRowHaveGuess(x, y, guess);
-        boolean col = doesColHaveGuess(x, y, guess);
+        // Only need to look at subgrid
+        // If a single value appears as a guess in the subgrid, we can confidently
+        //  say that the value belongs in the cell
         boolean grid = doesSubGridHaveGuess(x, y, guess);
-        return !(row || col || grid);
+        return !grid;
     }
 
     public void setSpotValue(int x, int y, int value) {
@@ -66,30 +67,9 @@ public class Grid {
         return false;
     }
 
-    private boolean doesRowHaveGuess(int x, int y, int guess) {
-        for(int i = 0; i < grid.length; i++) {
-            if(x == i) continue;
-            for(int j = 0; j < grid[y][i].getGuessAmnt(); j++) {
-                if(grid[y][i].getGuess(j) == guess) return true;
-            }
-
-        }
-        return false;
-    }
-
     private boolean doesColHaveValue(int x, int value) {
         for(int i = 0; i < grid.length; i++) {
             if(grid[i][x].getValue() == value) return true;
-        }
-        return false;
-    }
-
-    private boolean doesColHaveGuess(int x, int y, int guess) {
-        for(int i = 0; i < grid.length; i++) {
-            if(y == i) continue;
-            for(int j = 0; j < grid[i][x].getGuessAmnt(); j++) {
-                if(grid[i][x].getGuess(j) == guess) return true;
-            }
         }
         return false;
     }
@@ -120,8 +100,10 @@ public class Grid {
 
         for(int xMin = xMinOrig; xMin < xMax; xMin++) {
             for(int yMin = yMinOrig; yMin < yMax; yMin++) {
-                for(int j = 0; j < grid[yMin][xMin].getGuessAmnt(); j++) {
-                    if(grid[yMin][xMin].getValue() == guess) return true;
+                if(xMin == x && yMin == y) continue;
+                if(isSpotEmpty(xMin, yMin) &&
+                        grid[yMin][xMin].doesGuessContainvalue(guess)) {
+                    return true;
                 }
             }
         }
@@ -183,8 +165,16 @@ public class Grid {
         for(int y = 0; y < size; y++) {
             for(int x = 0; x < size; x++) {
                 System.out.print(grid[y][x].getValue() + " ");
+                if(x == 2 || x == 5) System.out.print("| ");
             }
             System.out.println();
+
+            if(y == 2 || y == 5) {
+                for(int x = 0; x < size+2; x++) {
+                    System.out.print("--");
+                }
+                System.out.println();
+            }
         }
     }
 }

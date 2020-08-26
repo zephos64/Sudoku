@@ -41,4 +41,8 @@ public class Cell {
     public int getGuess(int index) {
         return guesses.get(index);
     }
+
+    public boolean doesGuessContainvalue(int value) {
+        return guesses.contains(value);
+    }
 }
