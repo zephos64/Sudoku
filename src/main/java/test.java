@@ -18,16 +18,16 @@ public class test {
         // SC and BF: 20
         // SC, HS, and BF: 10
 
-        sudoku.printGrid();
+        Solver test = new Solver(sudoku);
 
+        test.printGrid();
         System.out.println("======================================");
 
         long startTime = System.currentTimeMillis();
-        Solver test = new Solver(sudoku);
         test.attemptGrid();
         long endTime = System.currentTimeMillis();
-        test.printGrid();
 
+        test.printGrid();
         System.out.println("======================================");
         System.out.println("Elapsed time: " + String.valueOf(endTime-startTime));
     }
